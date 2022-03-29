@@ -5,17 +5,16 @@
   export let activeMsg = "Submitting";
   export let completedMsg = "Success!";
 
+  let state = form.getState();
+
   const descriptionMap = {
     active: activeMsg,
     finished: completedMsg,
   };
 </script>
 
-{#if $form.state !== "default"}
-  <InlineLoading
-    status={$form.state}
-    description={descriptionMap[$form.state]}
-  />
+{#if $state !== "default"}
+  <InlineLoading status={$state} description={descriptionMap[$state]} />
 {:else}
   <Button type="submit">Submit</Button>
 {/if}

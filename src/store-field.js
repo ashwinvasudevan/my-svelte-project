@@ -33,10 +33,25 @@ export default function createFieldStore(field) {
     }));
   }
 
+  function reset(value) {
+    update((s) => ({
+      ...s,
+      dirty: false,
+      value,
+    }));
+  }
+
   return {
     subscribe,
     update,
     validate,
+    reset,
+    get value() {
+      return get(store).value;
+    },
+    set value(_value) {
+      update((s) => (s.value = _value), s);
+    },
     set,
   };
 }

@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "felte": "^1.1.4",
+    "lodash": "^4.17.21",
     "mitt": "^3.0.0",
     "sirv-cli": "^2.0.0"
   }

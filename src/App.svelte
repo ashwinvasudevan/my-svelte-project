@@ -10,7 +10,7 @@
   let form = new RegisterForm();
 </script>
 
-<Form
+<!-- <Form
   class="border-b-2 border-t-2 border-gray-300 border-solid pt-4 mt-10 pb-10 space-y-5"
   on:submit={(e) => {
     form.submit(e);
@@ -36,6 +36,6 @@
   </FormGroup>
 
   <FormSubmitButton {form} />
-</Form>
+</Form> -->
 
-<!-- <List /> -->
+<List />

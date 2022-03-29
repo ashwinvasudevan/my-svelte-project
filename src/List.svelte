@@ -1,29 +1,41 @@
 <script>
   import "carbon-components-svelte/css/white.css";
-  import FormComponent from "./FormComponent.svelte";
 
-  import { Form, FormGroup, Button, Search } from "carbon-components-svelte";
-  import FormSubmitButton from "./FormSubmitButton.svelte";
-  import RegisterForm from "./RegisterForm";
+  import {
+    Form,
+    FormGroup,
+    Checkbox,
+    Button,
+    Search,
+    OrderedList,
+    ListItem,
+  } from "carbon-components-svelte";
 
-  let form = new RegisterForm();
+  import { ListStore } from "./list-store.js";
+  import createFieldStore from "./store-field";
+
+  let searchField = createFieldStore({
+    type: "search",
+  });
+
+  let listStore = new ListStore();
+
+  let syncState = listStore.syncState;
 </script>
 
-<Form
-  class="border-b-2 border-t-2 border-gray-300 border-solid pt-4 mt-10 pb-10 space-y-5"
-  on:submit={(e) => {
-    form.submit(e);
-  }}
->
-  <FormGroup>
-    <FormComponent
-      field={$form.search}
-      {form}
-      labelText="Search"
-      placeholder="Enter Search"
-      autoValidate={true}
-    />
-  </FormGroup>
+<Search
+  labelText="Search"
+  placeholder="Enter Search"
+  bind:value={$searchField.value}
+/>
+{#if $syncState}
+  Syncing
+{/if}
 
-  <FormSubmitButton {form} />
-</Form>
+{#each $listStore as listItem}
+  <OrderedList>
+    <ListItem><Checkbox labelText="Label text" /></ListItem>
+    <ListItem><Checkbox labelText="Label text" /></ListItem>
+    <ListItem><Checkbox labelText="Label text" /></ListItem>
+  </OrderedList>
+{/each}

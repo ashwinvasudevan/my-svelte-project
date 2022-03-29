@@ -2,10 +2,9 @@
   import "carbon-components-svelte/css/white.css";
   import FormComponent from "./FormComponent.svelte";
 
-  import { Form, FormGroup } from "carbon-components-svelte";
+  import { Form, FormGroup, Button, Search } from "carbon-components-svelte";
   import FormSubmitButton from "./FormSubmitButton.svelte";
   import RegisterForm from "./RegisterForm";
-  import List from "./List.svelte";
 
   let form = new RegisterForm();
 </script>
@@ -18,24 +17,13 @@
 >
   <FormGroup>
     <FormComponent
-      field={$form.email}
+      field={$form.search}
       {form}
-      labelText="Email"
-      placeholder="Enter Email"
+      labelText="Search"
+      placeholder="Enter Search"
       autoValidate={true}
-    />
-  </FormGroup>
-
-  <FormGroup>
-    <FormComponent
-      field={$form.password}
-      {form}
-      labelText="Password"
-      placeholder="Enter Password"
     />
   </FormGroup>
 
   <FormSubmitButton {form} />
 </Form>
-
-<!-- <List /> -->

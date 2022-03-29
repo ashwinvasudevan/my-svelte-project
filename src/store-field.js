@@ -64,7 +64,6 @@ export default function createFieldStore(field, initialValue = null) {
     },
     set($s) {
       let value = $s.value;
-      console.log("set", value);
       $s.dirty = value === initialValue;
       set({ ...$s });
     },

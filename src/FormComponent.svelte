@@ -5,6 +5,7 @@
   export let form;
   export let labelText;
   export let placeholder;
+  export let autoValidate = false;
 </script>
 
 {#if $field.type === "email"}
@@ -12,16 +13,22 @@
     type="email"
     {labelText}
     {placeholder}
-    bind:value={$field.value}
     invalid={!!$field.error}
     invalidText={$field.error?.message}
     required={$field.required}
     disabled={$form.loading || $field.disabled}
-    on:change={() => {
-      // UPDATE VALUE TO DIRTY?
-      // ashwin
-      console.log($field)
-    }}
+    on:input={() => autoValidate && field.validate()}
+  />
+{:else if $field.type === "password"}
+  <TextInput
+    type="password"
+    {labelText}
+    {placeholder}
+    invalid={!!$field.error}
+    invalidText={$field.error?.message}
+    required={$field.required}
+    disabled={$form.loading || $field.disabled}
+    on:input={() => autoValidate && field.validate()}
   />
 {:else if $field.type === "boolean"}
   <Checkbox labelText="Label text" />

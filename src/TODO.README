@@ -1,6 +1,2 @@
 
 - TODO
-- Get Initial Values from Constructor - Add support for static and dynamic default (parse and constructor)
-- Update dirty field internally within createFieldStore using svelte update, onSuccessful save dirty should be false
-- ID should be generated server side, on save, local form should be updated with ID and all other values
-- Performing validation as soon as we type

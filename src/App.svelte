@@ -21,6 +21,7 @@
       {form}
       labelText="Email"
       placeholder="Enter Email"
+      autoValidate={true}
     />
   </FormGroup>
 

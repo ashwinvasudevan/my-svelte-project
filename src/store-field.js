@@ -1,8 +1,10 @@
 import { writable, get } from "svelte/store";
 
-export default function createFieldStore(field) {
+export default function createFieldStore(field, initialValue = null) {
+  initialValue === null && (initialValue = field.default);
+
   const store = writable({
-    value: "",
+    value: initialValue,
     error: null,
     dirty: false,
     validators: [],
@@ -13,17 +15,24 @@ export default function createFieldStore(field) {
 
   async function validate() {
     await new Promise((resolve) => setTimeout(resolve, 1000));
-    let { value, validators } = get(store);
-
+    let { value, validators, required } = get(store);
     let error = null;
 
-    for (let validator of validators) {
-      let message = await validator(value);
-      if (message) {
+    if (value == null) {
+      if (required) {
         error = {
-          message,
+          message: "This field is required",
         };
-        break;
+      }
+    } else {
+      for (let validator of validators) {
+        let message = await validator(value);
+        if (message) {
+          error = {
+            message,
+          };
+          break;
+        }
       }
     }
 
@@ -39,6 +48,7 @@ export default function createFieldStore(field) {
       dirty: false,
       value,
     }));
+    initialValue = value;
   }
 
   return {
@@ -52,6 +62,11 @@ export default function createFieldStore(field) {
     set value(_value) {
       update((s) => (s.value = _value), s);
     },
-    set,
+    set($s) {
+      let value = $s.value;
+      console.log("set", value);
+      $s.dirty = value === initialValue;
+      set({ ...$s });
+    },
   };
 }

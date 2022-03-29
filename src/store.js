@@ -102,6 +102,7 @@ export default class FormBase extends SvelteStore {
   }
 
   async save() {
+    // TODO MAKE SURE TO SET ALL VALUES FROM SERVER AFTER SAVE IS CALLED
     this.syncState.set(true);
     try {
       if (this.isNew()) {

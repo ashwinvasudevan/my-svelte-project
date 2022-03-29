@@ -30,18 +30,16 @@ export default class FormBase extends SvelteStore {
   };
 
   constructor() {
-    // GET INITIAL STATE FROM COLLECTION.
     super();
     this.state = writable("default");
     this.syncState = writable(false);
     this.syncError = writable(null);
-
-    let fields = this.getFieldDefs();
-
+    let fields =  this.getFieldDefs(); 
     this.value = Object.keys(fields).reduce((memo, key) => {
       memo[key] = createFieldStore(fields[key]);
       return memo;
     }, {});
+
   }
 
   getID() {

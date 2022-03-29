@@ -34,6 +34,7 @@ export class SvelteStore extends EventEmitter {
 
 export class SyncableStore extends SvelteStore {
   constructor() {
+    super();
     this.syncState = writable(false);
     this.syncError = writable(null);
   }

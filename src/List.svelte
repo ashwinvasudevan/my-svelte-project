@@ -13,6 +13,7 @@
 
   import { ListStore } from "./list-store.js";
   import createFieldStore from "./store-field";
+import { Model } from "./store.js";
 
   let searchField = createFieldStore({
     type: "search",
@@ -21,6 +22,10 @@
   let listStore = new ListStore();
 
   let syncState = listStore.syncState;
+  let model = {a: 'test',id: 1};
+  listStore.add([model])
+  listStore.add({a: 'test',id: 1})
+  $:console.log(listStore);
 </script>
 
 <Search

@@ -1,6 +1,16 @@
-import { cloneDeep, filter, find, times } from "lodash";
+import {
+  cloneDeep,
+  filter,
+  find,
+  times,
+  isPlainObject,
+  isArray,
+  _,
+} from "lodash";
 import { Tag } from "carbon-components-svelte";
 import { Model, Collection } from "./store";
+import { get } from "svelte/store";
+// const _ = require("lodash");
 
 export class Item extends Model {
   constructor(attrs) {
@@ -32,6 +42,7 @@ export class Item extends Model {
 
 export class ListStore extends Collection {
   constructor(items = []) {
+    super();
     this.items = this.parseItems(items);
   }
 
@@ -57,37 +68,97 @@ export class ListStore extends Collection {
     return this.items;
   }
 
-  add(MODEL || ARR OF MODELS || plain JSON || arr of plain JSON){
-
-    // Does not make backend ops unless save is called
-    // Note that adding the same model (a model with the same id) to a collection more than once
-    // is a no-op.
-
+  createModel(item) {
+    let model = new Model(item);
+    let isExist = this.checkItemExist();
+    if (isExist) {
+      // TODO
+    }
+    return model;
   }
 
-  remove(MODEL || ARR OF MODELS ){
-
+  checkItemExist(m) {
+    // TODO how to check with model instance
+    return _.result(_.find(this.items, { id: m.id }), "id");
   }
 
-  reset(EMPTY THE Collection || replace all colls || array of plan json or models to replace with) {
-
+  addItem(i) {
+    if (_.isPlainObject(i)) {
+      return this.createModel(i);
+    } else if (i instanceof Model) {
+      let isExist = this.checkItemExist(i);
+      if (!isExist) return i;
+    }
   }
 
-  get length() {
-    return this.items.length;
+  add(i) {
+    let newItems = [];
+    if (_.isArray(i)) {
+      i.forEach((_item) => {
+        newItems = [...newItems, this.addItem(_item)];
+      });
+    } else {
+      newItems = [...newItems, this.addItem(i)];
+    }
+
+    this.items = this.items.concat(newItems);
+    this._notify();
   }
 
-  filter(attrs) {
-
+  remove(i) {
+    if (_.isArray(i)) {
+      let items = _.remove(array, function (n) {
+        return !_.result(_.find(i, { id: m.id }), "id");
+      });
+      this.items = items;
+    } else {
+    }
+    // if(Array.isArray(myArray))
   }
 
-  find(attrs) {
-
+  reset() {
+    this.items = [];
   }
+
+  filter(id) {
+    return this.items.filter((item) => item.id === id);
+  }
+
+  find(id) {
+    return this.items.find((item) => item.id === id);
+  }
+
+  // add(MODEL || ARR OF MODELS || plain JSON || arr of plain JSON){
+
+  //   // Does not make backend ops unless save is called
+  //   // Note that adding the same model (a model with the same id) to a collection more than once
+  //   // is a no-op.
+
+  // }
+
+  // remove(MODEL || ARR OF MODELS ){
+
+  // }
+
+  // reset(EMPTY THE Collection || replace all colls || array of plan json or models to replace with) {
+
+  // }
+
+  // get length() {
+  //   return this.items.length;
+  // }
+
+  // filter(attrs) {
+
+  // }
+
+  // find(attrs) {
+
+  // }
 }
 
-2. Filtering 
-3. Sorting
+// 2. Filtering
+// 3. Sorting
 
-2. Paginated List Store
-3. 
+// 2. Paginated List Store
+// 3.

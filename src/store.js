@@ -142,3 +142,21 @@ export default class FormBase extends SvelteStore {
     return this.state;
   }
 }
+
+
+
+SEARCH 
+
+LIST 
+
+CLICK ITEM OPENS MODAL
+
+
+2 add_classes
+
+
+collection 
+model
+
+form base extends model
+

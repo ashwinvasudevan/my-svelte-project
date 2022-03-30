@@ -147,7 +147,7 @@ export class ListStore extends Collection {
     let keys = Object.keys(attrs);
     return this.items.filter((item) => {
       let values = keys.map((key) => attrs[key] === item.attrs[key]);
-      return values.every((bool) => bool === true);
+      return values.every((val) => val === true);
     });
   }
 
@@ -155,7 +155,7 @@ export class ListStore extends Collection {
     let keys = Object.keys(attrs);
     return this.items.find((item) => {
       let values = keys.map((key) => attrs[key] === item.attrs[key]);
-      return values.every((bool) => bool === true);
+      return values.every((val) => val === true);
     });
   }
 

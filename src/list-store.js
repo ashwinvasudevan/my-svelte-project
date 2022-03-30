@@ -71,19 +71,20 @@ export class ListStore extends Collection {
 
   checkItemExist(m) {
     if (m.id) {
+      // Just use ===
       return this.items.find((item) => isEqual(get(item).id, get(m).id));
     }
     return this.items.find((item) => isEqual(get(item).cid, get(m).cid));
   }
 
-  handleItemExist(exist, i) {
-    if (exist) {
-      let index = this.findIndex(exist);
-      this.items[index] = i;
-    } else {
-      this.items.push(i);
-    }
-  }
+  // handleItemExist(exist, i) {
+  //   if (exist) {
+  //     let index = this.findIndex(exist);
+  //     this.items[index] = i;
+  //   } else {
+  //     this.items.push(i);
+  //   }
+  // }
 
   createModel(item) {
     if (!item.id) {
@@ -91,16 +92,32 @@ export class ListStore extends Collection {
       this.cidCount += 1;
     }
     let model = new Item(item);
-    let exist = this.checkItemExist(model);
-    this.handleItemExist(exist, model);
+    return model;
+
+    // let exist = this.checkItemExist(model);
+    // this.handleItemExist(exist, model);
   }
 
-  addItem(i) {
-    if (isPlainObject(i)) {
-      this.createModel(i);
-    } else if (i.isModel) {
-      let exist = this.checkItemExist(i);
-      this.handleItemExist(exist, i);
+  exists() {
+    // Returns true / false
+  }
+
+  replace() {
+    // accept model and accept an index, and replace.
+  }
+
+  addItem(item) {
+    let model = item;
+
+    if (isPlainObject(item)) {
+      model = this.createModel(item);
+    }
+
+    let exist = this.exists(model);
+    if (exist) {
+      //
+    } else {
+      //
     }
   }
 
@@ -112,7 +129,7 @@ export class ListStore extends Collection {
     } else {
       this.addItem(items);
     }
-    this._notify();
+    // this._notify(); Move into addItem
   }
 
   removeItem(item) {
@@ -123,6 +140,7 @@ export class ListStore extends Collection {
   }
 
   remove(i) {
+    // Add support for ID, model and arr of models.
     if (isArray(i)) {
       i.forEach((item) => {
         this.removeItem(item);
@@ -138,22 +156,28 @@ export class ListStore extends Collection {
     this._notify();
   }
 
-  filter(a) {
-    let keys = Object.keys(a);
+  filter(attrs) {
+    let keys = Object.keys(attrs);
     return this.items.filter((item) => {
-      let count = 0;
-      keys.forEach((k) => {
-        if (item.attrs[k] === a[k]) {
-          count += 1;
-        }
-      });
-      if (count === keys.length) {
-        return item;
-      }
+      // Rename bools
+      let bools = keys.map((key) => attrs[key] === item.attrs[key]);
+      return bools.every((bool) => bool === true);
+
+      // let count = 0;
+
+      // keys.forEach((k) => {
+      //   if (item.attrs[k] === a[k]) {
+      //     count += 1;
+      //   }
+      // });
+      // if (count === keys.length) {
+      //   return item;
+      // }
     });
   }
 
   find(a) {
+    // Change to declarative style
     let keys = Object.keys(a);
     return this.items.find((item) => {
       let count = 0;
@@ -169,6 +193,7 @@ export class ListStore extends Collection {
   }
 
   findIndex(m) {
+    // Should be based on ID, CID,
     return this.items.findIndex((item) => isEqual(get(item), get(m)));
   }
 
@@ -188,6 +213,7 @@ export class ListStore extends Collection {
 
   // }
 
+  // UNCOMMENT
   // get length() {
   //   return this.items.length;
   // }

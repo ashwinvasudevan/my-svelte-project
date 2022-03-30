@@ -21,9 +21,8 @@
   let listStore = new ListStore();
 
   let syncState = listStore.syncState;
-  let model = { a: "test1", id: 1 };
-  listStore.add([model]);
-  listStore.add({ a: "test", id: 1 });
+  listStore.add([{ a: "test", id: 1 }]);
+  listStore.add({ a: "test", id: 2 });
   // $: console.log(listStore);
 </script>
 
@@ -46,7 +45,6 @@
 
 <button
   on:click={() => {
-    console.log(listStore.items);
     listStore.add({ a: "test", id: listStore.items.length + 1 });
   }}>Add</button
 >
@@ -57,12 +55,12 @@
 >
 <button
   on:click={() => {
-    console.log(listStore.filter({a: "test", id: 3}));
+    console.log(listStore.filter({a: "test", id: 1}));
   }}>Filter</button
 >
 <button
   on:click={() => {
-  console.log(listStore.find({a: "test",id : 1}))
+  console.log(listStore.find({a: "test"}))
   }}>Find</button
 >
 <button on:click={() => listStore.reset()}>reset</button>

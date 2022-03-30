@@ -44,6 +44,7 @@ export class ListStore extends Collection {
   constructor(items = []) {
     super();
     this.items = this.parseItems(items);
+    this.cidCount = 1;
   }
 
   getUrlRoot() {
@@ -69,52 +70,53 @@ export class ListStore extends Collection {
   }
 
   checkItemExist(m) {
-    return this.items.find((item) => isEqual(get(item), get(m)));
+    if (m.id) {
+      return this.items.find((item) => isEqual(get(item).id, get(m).id));
+    }
+    return this.items.find((item) => isEqual(get(item).cid, get(m).cid));
   }
 
-  handleItemExist(isExist, m) {
-    if (isExist) {
-      throw new Error("Already exists");
+  handleItemExist(exist, i) {
+    if (exist) {
+      let index = this.findIndex(exist);
+      this.items[index] = i;
     } else {
-      return m;
+      this.items.push(i);
     }
   }
 
   createModel(item) {
+    if (!item.id) {
+      item.cid = this.cidCount;
+      this.cidCount += 1;
+    }
     let model = new Item(item);
-    let isExist = this.checkItemExist(model);
-    return this.handleItemExist(isExist, model);
+    let exist = this.checkItemExist(model);
+    this.handleItemExist(exist, model);
   }
 
   addItem(i) {
     if (isPlainObject(i)) {
-      return this.createModel(i);
+      this.createModel(i);
     } else if (i.isModel) {
-      let isExist = this.checkItemExist(i);
-      return this.handleItemExist(isExist, i);
+      let exist = this.checkItemExist(i);
+      this.handleItemExist(exist, i);
     }
   }
 
-  add(i) {
-    let newItems = [];
-    try {
-      if (isArray(i)) {
-        i.forEach((_item) => {
-          newItems = [...newItems, this.addItem(_item)];
-        });
-      } else {
-        newItems = [...newItems, this.addItem(i)];
-      }
-    } catch (e) {
-      console.log(e);
+  add(items) {
+    if (isArray(items)) {
+      items.forEach((item) => {
+        this.addItem(item);
+      });
+    } else {
+      this.addItem(items);
     }
-
-    this.items = this.items.concat(newItems);
     this._notify();
   }
 
   removeItem(item) {
-    if (item.isModel && this.checkItemExist(item)) {
+    if (this.checkItemExist(item)) {
       let index = this.findIndex(item);
       this.items.splice(index, 1);
     }
@@ -137,9 +139,8 @@ export class ListStore extends Collection {
   }
 
   filter(a) {
-    let fArr = [];
     let keys = Object.keys(a);
-    this.items.forEach((item) => {
+    return this.items.filter((item) => {
       let count = 0;
       keys.forEach((k) => {
         if (item.attrs[k] === a[k]) {
@@ -147,16 +148,14 @@ export class ListStore extends Collection {
         }
       });
       if (count === keys.length) {
-        fArr.push(item);
+        return item;
       }
     });
-    return fArr;
   }
 
   find(a) {
-    let fValue;
     let keys = Object.keys(a);
-    for (let item of this.items) {
+    return this.items.find((item) => {
       let count = 0;
       keys.forEach((k) => {
         if (item.attrs[k] === a[k]) {
@@ -164,11 +163,9 @@ export class ListStore extends Collection {
         }
       });
       if (count === keys.length) {
-        fValue = item;
-        break;
+        return item;
       }
-    }
-    return fValue;
+    });
   }
 
   findIndex(m) {

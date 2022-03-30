@@ -125,7 +125,6 @@ export class ListStore extends Collection {
 
   remove(items) {
     // supports for ID, model and arr of models.
-    debugger;
     if (isArray(items)) {
       items.forEach((item) => {
         this.removeItem(item);

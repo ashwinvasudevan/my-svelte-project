@@ -120,6 +120,7 @@ export class ListStore extends Collection {
     if (this.checkItemExist(item)) {
       let index = this.findIndex(item);
       this.items.splice(index, 1);
+      this._notify();
     }
   }
 
@@ -135,7 +136,6 @@ export class ListStore extends Collection {
       let model = this.find({ id: items });
       this.removeItem(model);
     }
-    this._notify();
   }
 
   reset() {

@@ -14,6 +14,7 @@ import { get } from "svelte/store";
 
 export class Item extends Model {
   constructor(attrs) {
+    super();
     this.attrs = attrs;
   }
 
@@ -69,25 +70,27 @@ export class ListStore extends Collection {
   }
 
   createModel(item) {
-    let model = new Model(item);
-    let isExist = this.checkItemExist();
+    let model = new Item(item);
+    let isExist = this.checkItemExist(model);
     if (isExist) {
-      // TODO
+      return null;
+    } else {
+      return model;
     }
-    return model;
   }
 
   checkItemExist(m) {
     // TODO how to check with model instance
-    return _.result(_.find(this.items, { id: m.id }), "id");
+    return this.items.find((item) => _.isEqual(get(item), get(m)));
   }
 
   addItem(i) {
     if (_.isPlainObject(i)) {
       return this.createModel(i);
-    } else if (i instanceof Model) {
+    } else if (i instanceof Item) {
       let isExist = this.checkItemExist(i);
       if (!isExist) return i;
+      return null;
     }
   }
 
@@ -107,25 +110,32 @@ export class ListStore extends Collection {
 
   remove(i) {
     if (_.isArray(i)) {
-      let items = _.remove(array, function (n) {
-        return !_.result(_.find(i, { id: m.id }), "id");
+      i.forEach((item) => {
+        let index = this.findIndex(item);
+        this.items.splice(index, 1);
       });
-      this.items = items;
+     
     } else {
+      let index = this.findIndex(i);
+      this.items.splice(index, 1);
     }
-    // if(Array.isArray(myArray))
+    this._notify();
   }
 
   reset() {
     this.items = [];
   }
 
-  filter(id) {
-    return this.items.filter((item) => item.id === id);
+  filter(m) {
+    return this.items.filter((item) => _.isEqual(get(item), get(m)));
   }
 
-  find(id) {
-    return this.items.find((item) => item.id === id);
+  find(m) {
+    return this.items.find((item) => _.isEqual(get(item), get(m)));
+  }
+
+  findIndex(m) {
+    return this.items.findIndex((item) => _.isEqual(get(item), get(m)));
   }
 
   // add(MODEL || ARR OF MODELS || plain JSON || arr of plain JSON){

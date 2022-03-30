@@ -24,6 +24,7 @@ export class SvelteStore extends EventEmitter {
   }
 
   getStoreValue() {
+    return this;
     throw new Error("Not implemented");
   }
 

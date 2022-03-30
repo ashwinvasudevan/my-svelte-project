@@ -36,7 +36,7 @@
   Syncing
 {/if}
 
-<div>{listStore.items.length}</div>
+<div>{$listStore.length}</div>
 
 <OrderedList>
   {#each $listStore as listItem}

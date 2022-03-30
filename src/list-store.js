@@ -5,12 +5,11 @@ import {
   times,
   isPlainObject,
   isArray,
-  _,
+  isEqual,
 } from "lodash";
 import { Tag } from "carbon-components-svelte";
 import { Model, Collection } from "./store";
 import { get } from "svelte/store";
-// const _ = require("lodash");
 
 export class Item extends Model {
   constructor(attrs) {
@@ -69,73 +68,111 @@ export class ListStore extends Collection {
     return this.items;
   }
 
-  createModel(item) {
-    let model = new Item(item);
-    let isExist = this.checkItemExist(model);
+  checkItemExist(m) {
+    return this.items.find((item) => isEqual(get(item), get(m)));
+  }
+
+  handleItemExist(isExist, m) {
     if (isExist) {
-      return null;
+      throw new Error("Already exists");
     } else {
-      return model;
+      return m;
     }
   }
 
-  checkItemExist(m) {
-    // TODO how to check with model instance
-    return this.items.find((item) => _.isEqual(get(item), get(m)));
+  createModel(item) {
+    let model = new Item(item);
+    let isExist = this.checkItemExist(model);
+    return this.handleItemExist(isExist, model);
   }
 
   addItem(i) {
-    if (_.isPlainObject(i)) {
+    if (isPlainObject(i)) {
       return this.createModel(i);
-    } else if (i instanceof Item) {
+    } else if (i.isModel) {
       let isExist = this.checkItemExist(i);
-      if (!isExist) return i;
-      return null;
+      return this.handleItemExist(isExist, i);
     }
   }
 
   add(i) {
     let newItems = [];
-    if (_.isArray(i)) {
-      i.forEach((_item) => {
-        newItems = [...newItems, this.addItem(_item)];
-      });
-    } else {
-      newItems = [...newItems, this.addItem(i)];
+    try {
+      if (isArray(i)) {
+        i.forEach((_item) => {
+          newItems = [...newItems, this.addItem(_item)];
+        });
+      } else {
+        newItems = [...newItems, this.addItem(i)];
+      }
+    } catch (e) {
+      console.log(e);
     }
 
     this.items = this.items.concat(newItems);
     this._notify();
   }
 
-  remove(i) {
-    if (_.isArray(i)) {
-      i.forEach((item) => {
-        let index = this.findIndex(item);
-        this.items.splice(index, 1);
-      });
-     
-    } else {
-      let index = this.findIndex(i);
+  removeItem(item) {
+    if (item.isModel && this.checkItemExist(item)) {
+      let index = this.findIndex(item);
       this.items.splice(index, 1);
+    }
+  }
+
+  remove(i) {
+    if (isArray(i)) {
+      i.forEach((item) => {
+        this.removeItem(item);
+      });
+    } else {
+      this.removeItem(i);
     }
     this._notify();
   }
 
   reset() {
     this.items = [];
+    this._notify();
   }
 
-  filter(m) {
-    return this.items.filter((item) => _.isEqual(get(item), get(m)));
+  filter(a) {
+    let fArr = [];
+    let keys = Object.keys(a);
+    this.items.forEach((item) => {
+      let count = 0;
+      keys.forEach((k) => {
+        if (item.attrs[k] === a[k]) {
+          count += 1;
+        }
+      });
+      if (count === keys.length) {
+        fArr.push(item);
+      }
+    });
+    return fArr;
   }
 
-  find(m) {
-    return this.items.find((item) => _.isEqual(get(item), get(m)));
+  find(a) {
+    let fValue;
+    let keys = Object.keys(a);
+    for (let item of this.items) {
+      let count = 0;
+      keys.forEach((k) => {
+        if (item.attrs[k] === a[k]) {
+          count += 1;
+        }
+      });
+      if (count === keys.length) {
+        fValue = item;
+        break;
+      }
+    }
+    return fValue;
   }
 
   findIndex(m) {
-    return this.items.findIndex((item) => _.isEqual(get(item), get(m)));
+    return this.items.findIndex((item) => isEqual(get(item), get(m)));
   }
 
   // add(MODEL || ARR OF MODELS || plain JSON || arr of plain JSON){

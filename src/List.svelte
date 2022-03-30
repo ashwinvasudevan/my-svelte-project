@@ -14,7 +14,6 @@
   import { ListStore } from "./list-store.js";
   import createFieldStore from "./store-field";
 
-
   let searchField = createFieldStore({
     type: "search",
   });
@@ -22,10 +21,10 @@
   let listStore = new ListStore();
 
   let syncState = listStore.syncState;
-  let model = { a: "test", id: 1 };
+  let model = { a: "test1", id: 1 };
   listStore.add([model]);
   listStore.add({ a: "test", id: 1 });
-  $: console.log(listStore);
+  // $: console.log(listStore);
 </script>
 
 <Search
@@ -37,18 +36,16 @@
   Syncing
 {/if}
 
-{#each $listStore as listItem}
-  <OrderedList>
+<OrderedList>
+  {#each $listStore as listItem}
     <ListItem><Checkbox labelText="Label text" /></ListItem>
-    <ListItem><Checkbox labelText="Label text" /></ListItem>
-    <ListItem><Checkbox labelText="Label text" /></ListItem>
-  </OrderedList>
-{/each}
+  {/each}
+</OrderedList>
 
 <button
   on:click={() => {
-    console.log(listStore.items)
-    listStore.add({ a: "test", id: 2 });
+    console.log(listStore.items);
+    listStore.add({ a: "test", id: listStore.items.length + 1 });
   }}>Add</button
 >
 <button
@@ -58,10 +55,12 @@
 >
 <button
   on:click={() => {
-    console.log(listStore.filter())
+    console.log(listStore.filter({a: "test", id: 3}));
   }}>Filter</button
 >
-<button on:click={() => {
-  console.log(listStore.find())
-}}>Find</button>
-<button>reset</button>
+<button
+  on:click={() => {
+  console.log(listStore.find({a: "test",id : 1}))
+  }}>Find</button
+>
+<button on:click={() => listStore.reset()}>reset</button>

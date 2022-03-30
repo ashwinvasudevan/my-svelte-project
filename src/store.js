@@ -50,8 +50,21 @@ export class SyncableStore extends SvelteStore {
 }
 
 export class Model extends SyncableStore {
+  constructor() {
+    super();
+    this._isModel = true;
+  }
+
   isNew() {
     return !this.id;
+  } 
+
+  get isModel() {
+    return this._isModel;
+  }
+
+  set isModel(val) {
+    this._isModel = val;
   }
 
   get id() {

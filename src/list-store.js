@@ -1,13 +1,4 @@
-import {
-  cloneDeep,
-  filter,
-  find,
-  times,
-  isPlainObject,
-  isArray,
-  isEqual,
-} from "lodash";
-import { Tag } from "carbon-components-svelte";
+import { cloneDeep, isPlainObject, isArray } from "lodash";
 import { Model, Collection } from "./store";
 import { get } from "svelte/store";
 
@@ -69,41 +60,33 @@ export class ListStore extends Collection {
     return this.items;
   }
 
-  checkItemExist(m) {
-    if (m.id) {
-      // Just use ===
-      return this.items.find((item) => isEqual(get(item).id, get(m).id));
+  checkItemExist(model) {
+    if (model.id) {
+      return this.items.find((item) => get(item).id === get(model).id);
     }
-    return this.items.find((item) => isEqual(get(item).cid, get(m).cid));
+    return this.items.find((item) => get(item).cid === get(model).cid);
   }
-
-  // handleItemExist(exist, i) {
-  //   if (exist) {
-  //     let index = this.findIndex(exist);
-  //     this.items[index] = i;
-  //   } else {
-  //     this.items.push(i);
-  //   }
-  // }
 
   createModel(item) {
     if (!item.id) {
-      item.cid = this.cidCount;
+      item.cid = `c${this.cidCount}`;
       this.cidCount += 1;
     }
     let model = new Item(item);
     return model;
-
-    // let exist = this.checkItemExist(model);
-    // this.handleItemExist(exist, model);
   }
 
-  exists() {
+  exists(model) {
     // Returns true / false
+    if (model.id) {
+      return this.items.find((item) => get(item).id === get(model).id);
+    }
+    return this.items.find((item) => get(item).cid === get(model).cid);
   }
 
-  replace() {
+  replace(model, index) {
     // accept model and accept an index, and replace.
+    this.items[index] = model;
   }
 
   addItem(item) {
@@ -115,10 +98,12 @@ export class ListStore extends Collection {
 
     let exist = this.exists(model);
     if (exist) {
-      //
+      let index = this.findIndex(exist);
+      this.replace(model, index);
     } else {
-      //
+      this.items.push(model);
     }
+    this._notify();
   }
 
   add(items) {
@@ -129,7 +114,6 @@ export class ListStore extends Collection {
     } else {
       this.addItem(items);
     }
-    // this._notify(); Move into addItem
   }
 
   removeItem(item) {
@@ -139,14 +123,18 @@ export class ListStore extends Collection {
     }
   }
 
-  remove(i) {
-    // Add support for ID, model and arr of models.
-    if (isArray(i)) {
-      i.forEach((item) => {
+  remove(items) {
+    // supports for ID, model and arr of models.
+    debugger;
+    if (isArray(items)) {
+      items.forEach((item) => {
         this.removeItem(item);
       });
+    } else if (items.isModel) {
+      this.removeItem(item);
     } else {
-      this.removeItem(i);
+      let model = this.find({ id: items });
+      this.removeItem(model);
     }
     this._notify();
   }
@@ -159,42 +147,25 @@ export class ListStore extends Collection {
   filter(attrs) {
     let keys = Object.keys(attrs);
     return this.items.filter((item) => {
-      // Rename bools
-      let bools = keys.map((key) => attrs[key] === item.attrs[key]);
-      return bools.every((bool) => bool === true);
-
-      // let count = 0;
-
-      // keys.forEach((k) => {
-      //   if (item.attrs[k] === a[k]) {
-      //     count += 1;
-      //   }
-      // });
-      // if (count === keys.length) {
-      //   return item;
-      // }
+      let values = keys.map((key) => attrs[key] === item.attrs[key]);
+      return values.every((bool) => bool === true);
     });
   }
 
-  find(a) {
-    // Change to declarative style
-    let keys = Object.keys(a);
+  find(attrs) {
+    let keys = Object.keys(attrs);
     return this.items.find((item) => {
-      let count = 0;
-      keys.forEach((k) => {
-        if (item.attrs[k] === a[k]) {
-          count += 1;
-        }
-      });
-      if (count === keys.length) {
-        return item;
-      }
+      let values = keys.map((key) => attrs[key] === item.attrs[key]);
+      return values.every((bool) => bool === true);
     });
   }
 
-  findIndex(m) {
+  findIndex(model) {
     // Should be based on ID, CID,
-    return this.items.findIndex((item) => isEqual(get(item), get(m)));
+    return this.items.findIndex(
+      (item) =>
+        get(item).id === get(model).id && get(item).cid === get(model).cid
+    );
   }
 
   // add(MODEL || ARR OF MODELS || plain JSON || arr of plain JSON){

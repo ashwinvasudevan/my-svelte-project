@@ -39,28 +39,31 @@
 
 <OrderedList>
   {#each $listStore as listItem}
-    <ListItem><Checkbox labelText="Label text" /></ListItem>
+    <ListItem>
+      <Checkbox labelText="Label text" />
+      <div>{JSON.stringify(listItem)}</div>
+    </ListItem>
   {/each}
 </OrderedList>
 
 <button
   on:click={() => {
-    listStore.add({ a: "test", id: listStore.items.length + 1 });
+    listStore.add({ a: "fdsfsd" });
   }}>Add</button
 >
 <button
   on:click={() => {
-    listStore.remove(listStore.items[0]);
+    listStore.remove(2);
   }}>Remove</button
 >
 <button
   on:click={() => {
-    console.log(listStore.filter({a: "test", id: 1}));
+    console.log(listStore.filter({ a: "test" }));
   }}>Filter</button
 >
 <button
   on:click={() => {
-  console.log(listStore.find({a: "test"}))
+    console.log(listStore.find({ a: "fsdfsd" }));
   }}>Find</button
 >
 <button on:click={() => listStore.reset()}>reset</button>

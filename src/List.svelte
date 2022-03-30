@@ -36,6 +36,8 @@
   Syncing
 {/if}
 
+<div>{listStore.items.length}</div>
+
 <OrderedList>
   {#each $listStore as listItem}
     <ListItem><Checkbox labelText="Label text" /></ListItem>
